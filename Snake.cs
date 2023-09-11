@@ -32,5 +32,6 @@ public class SnakeSegment
                 position[0]++;
                 break;
         }
+        return;
     }
 }

@@ -37,6 +37,7 @@ class SnakeGame
             Thread.Sleep(200);
             Console.Clear();
         }
+        return;
     }
 
 
@@ -79,6 +80,7 @@ class SnakeGame
         {
             snake[0].direction = direction;
         }
+        return;
     }
 
 
@@ -123,6 +125,7 @@ class SnakeGame
     
         newSegmentPosition[0] = lastSegment.position[0] + dx;
         newSegmentPosition[1] = lastSegment.position[1] + dy;
+        return;
     }
 
 
@@ -132,15 +135,13 @@ class SnakeGame
         {
             foreach (SnakeSegment j in snake)
             {
-                if(i != j)
+                if(i.position[0] == j.position[0] && i.position[1] == j.position[1] && i != j)
                 {
-                    if(i.position[0] == j.position[0] && i.position[1] == j.position[1])
-                    {
-                        gameOver = true;
-                        return;
-                    }
+                    gameOver = true;
+                    return;
                 }
             }
         }
+        return;
     }
 }
