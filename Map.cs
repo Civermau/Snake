@@ -13,6 +13,7 @@ public class Map
                 map[i, j] = 0;
             }
         }
+        return;
     }
     public void PrintMap()
     {
@@ -38,5 +39,6 @@ public class Map
             Console.WriteLine("# ");
         }
         Console.WriteLine("# # # # # # # # # # # #");
+        return;
     }
 }
