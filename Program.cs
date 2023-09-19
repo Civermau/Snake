@@ -8,15 +8,35 @@ class SnakeGame
     static bool gameOver = false;
     static void Main()
     {
-//*s        Thread collision = new Thread(CheckSelfCollision);
         List<SnakeSegment> snake = new List<SnakeSegment>();
         int[] startPosition = new int[] { 5, 5 };
         int[] newSegmentPosition = new int[] { 0, 0 };
         snake.Add(new SnakeSegment(startPosition));
 
+        String DifInput;
+        int Dif;
+        bool DifSelected = false;
+
         Map map = new Map();
         Food food = new Food();
         InitializeFoodPosition(food);
+        Console.Clear();
+        do
+        {
+            Console.WriteLine("Set Difficulty:");
+            Console.WriteLine("1: Easy\n2: Medium\n3: Hard\n4: Very Hard");
+            DifInput = Console.ReadLine();
+            if (int.TryParse(DifInput, out Dif))
+            {
+                if (Dif < 5 && Dif > 0)
+                {
+                    Dif *= 100;
+                    Dif = 500 - Dif;
+                    DifSelected = true;
+                }
+            }
+            Console.Clear();
+        } while (!DifSelected);
 
         while (!gameOver)
         {
@@ -30,14 +50,38 @@ class SnakeGame
             }
 
             UpdateFoodPosition(food, map);
-            UpdateSnakePosition(snake, map, newSegmentPosition, food);
+            try
+            {
+                UpdateSnakePosition(snake, map, newSegmentPosition, food);
+            }
+            catch (System.IndexOutOfRangeException)
+            {
+                gameOver = true;
+            }
             Console.WriteLine("      Snake game!");
             map.PrintMap();
             CheckSelfCollision(snake);
-            Thread.Sleep(200);
+            Thread.Sleep(Dif);
             Console.Clear();
         }
-        return;
+
+        bool tryAgain = true;
+        do
+        {
+            Console.WriteLine("You Died!");
+            Console.WriteLine("Play Again? (y/n)");
+            String input = Console.ReadLine().ToLower();
+            if (input == "n")
+            {
+                tryAgain = false;
+            }
+            if (input == "y")
+            {
+                gameOver = false;
+                Main();
+            }
+            Console.Clear();
+        } while (tryAgain);
     }
 
 
@@ -63,7 +107,7 @@ class SnakeGame
     static void HandleInput(List<SnakeSegment> snake)
     {
         ConsoleKeyInfo input = Console.ReadKey(intercept: true);
-    
+
         Dictionary<ConsoleKey, SnakeSegment.dir> keyToDirection = new Dictionary<ConsoleKey, SnakeSegment.dir>
         {
             { ConsoleKey.W, SnakeSegment.dir.Up },
@@ -75,12 +119,11 @@ class SnakeGame
             { ConsoleKey.DownArrow, SnakeSegment.dir.Down },
             { ConsoleKey.RightArrow, SnakeSegment.dir.Right }
         };
-    
+
         if (keyToDirection.TryGetValue(input.Key, out SnakeSegment.dir direction))
         {
             snake[0].direction = direction;
         }
-        return;
     }
 
 
@@ -112,7 +155,7 @@ class SnakeGame
     static void NewSegmentPosition(List<SnakeSegment> snake, int[] newSegmentPosition)
     {
         SnakeSegment lastSegment = snake[snake.Count - 1];
-    
+
         Dictionary<SnakeSegment.dir, (int, int)> directionChanges = new Dictionary<SnakeSegment.dir, (int, int)>
         {
             { SnakeSegment.dir.Left, (0, 1) },
@@ -122,26 +165,23 @@ class SnakeGame
         };
 
         (int dx, int dy) = directionChanges[lastSegment.direction];
-    
+
         newSegmentPosition[0] = lastSegment.position[0] + dx;
         newSegmentPosition[1] = lastSegment.position[1] + dy;
-        return;
     }
 
 
     static void CheckSelfCollision(List<SnakeSegment> snake)
     {
-        foreach (SnakeSegment i in snake)
+        for (int i = 1; i < snake.Count; i++)
         {
-            foreach (SnakeSegment j in snake)
+            if (snake[0].position[0] == snake[i].position[0])
             {
-                if(i.position[0] == j.position[0] && i.position[1] == j.position[1] && i != j)
+                if (snake[0].position[1] == snake[i].position[1])
                 {
                     gameOver = true;
-                    return;
                 }
             }
         }
-        return;
     }
 }
