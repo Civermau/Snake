@@ -26,6 +26,7 @@ class SnakeGame
         Console.Clear();
         do
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Set Difficulty:");
             Console.WriteLine("1: Easy\n2: Medium\n3: Hard\n4: Very Hard");
             DifInput = Console.ReadLine()!;
@@ -41,7 +42,7 @@ class SnakeGame
                 {
                     inclusiveMode = true;
                     Console.Clear();
-                    Console.WriteLine("Secret rainbow worm enabled!");
+                    Console.WriteLine("Super secret rainbow worm enabled!");
                     Thread.Sleep(2000);
                 }
             }
@@ -69,6 +70,7 @@ class SnakeGame
                 gameOver = true;
             }
             CheckForFoodOnSnake(food, snake);
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("      Snake game!");
             map.PrintMap();
             CheckSelfCollision(snake);
@@ -79,6 +81,7 @@ class SnakeGame
         bool tryAgain = true;
         do
         {
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("You Died!");
             Console.WriteLine("Play Again? (y/n)");
             String input = Console.ReadLine()!.ToLower();
