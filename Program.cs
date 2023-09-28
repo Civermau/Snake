@@ -6,6 +6,7 @@ using static SnakeSegment;
 class SnakeGame
 {
     static bool gameOver = false;
+    static bool inclusiveMode = false;
     static void Main()
     {
         List<SnakeSegment> snake = new List<SnakeSegment>();
@@ -16,6 +17,8 @@ class SnakeGame
         String DifInput;
         int Dif;
         bool DifSelected = false;
+        
+
 
         Map map = new Map();
         Food food = new Food();
@@ -25,7 +28,7 @@ class SnakeGame
         {
             Console.WriteLine("Set Difficulty:");
             Console.WriteLine("1: Easy\n2: Medium\n3: Hard\n4: Very Hard");
-            DifInput = Console.ReadLine();
+            DifInput = Console.ReadLine()!;
             if (int.TryParse(DifInput, out Dif))
             {
                 if (Dif < 5 && Dif > 0)
@@ -33,6 +36,13 @@ class SnakeGame
                     Dif *= 100;
                     Dif = 500 - Dif;
                     DifSelected = true;
+                }
+                if(Dif == 5)
+                {
+                    inclusiveMode = true;
+                    Console.Clear();
+                    Console.WriteLine("Secret rainbow worm enabled!");
+                    Thread.Sleep(2000);
                 }
             }
             Console.Clear();
@@ -58,6 +68,7 @@ class SnakeGame
             {
                 gameOver = true;
             }
+            CheckForFoodOnSnake(food, snake);
             Console.WriteLine("      Snake game!");
             map.PrintMap();
             CheckSelfCollision(snake);
@@ -70,7 +81,7 @@ class SnakeGame
         {
             Console.WriteLine("You Died!");
             Console.WriteLine("Play Again? (y/n)");
-            String input = Console.ReadLine().ToLower();
+            String input = Console.ReadLine()!.ToLower();
             if (input == "n")
             {
                 tryAgain = false;
@@ -122,7 +133,25 @@ class SnakeGame
 
         if (keyToDirection.TryGetValue(input.Key, out SnakeSegment.dir direction))
         {
-            snake[0].direction = direction;
+            switch (direction)
+            {
+                case SnakeSegment.dir.Up:
+                    if (snake[0].direction != SnakeSegment.dir.Down)
+                        snake[0].direction = direction;
+                    break;
+                case SnakeSegment.dir.Left:
+                    if (snake[0].direction != SnakeSegment.dir.Right)
+                        snake[0].direction = direction;
+                    break;
+                case SnakeSegment.dir.Down:
+                    if (snake[0].direction != SnakeSegment.dir.Up)
+                        snake[0].direction = direction;
+                    break; 
+                case SnakeSegment.dir.Right:
+                    if (snake[0].direction != SnakeSegment.dir.Left)
+                        snake[0].direction = direction;
+                    break;
+            }
         }
     }
 
@@ -133,14 +162,39 @@ class SnakeGame
         return;
     }
 
+    static void CheckForFoodOnSnake(Food food, List<SnakeSegment> snake)
+    {
+        foreach(SnakeSegment segment in snake)
+        {
+            if (food.position[0] == segment.position[0] && food.position[1] == segment.position[1])
+            {
+                InitializeFoodPosition(food);
+            }
+        }
+    }
+
     static void UpdateSnakePosition(List<SnakeSegment> snake, Map map, int[] newSegmentPosition, Food food)
     {
-        map.map[food.position[0], food.position[1]] = 2;
+        map.map[food.position[0], food.position[1]] = 7;
 
-        foreach (SnakeSegment segment in snake)
+        for (int i = 0; i <= snake.Count - 1; i++)
         {
-            segment.moveSegment(segment.direction);
-            map.map[segment.position[0], segment.position[1]] = 1;
+            snake[i].moveSegment(snake[i].direction);
+            if (inclusiveMode)
+            {
+                map.map[snake[i].position[0], snake[i].position[1]] = i % 6 + 1;
+            }
+            else
+            {
+                if (i == 0)
+                {
+                    map.map[snake[i].position[0], snake[i].position[1]] = 3;
+                }
+                else
+                {
+                    map.map[snake[i].position[0], snake[i].position[1]] = 4;
+                }
+            }
         }
 
         if (snake[0].position[0] == food.position[0] && snake[0].position[1] == food.position[1])
